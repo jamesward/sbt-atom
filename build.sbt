@@ -18,8 +18,6 @@ libraryDependencies ++= Seq(
 
 publishMavenStyle := false
 
-//bintrayOrganization := Some("sbt-plugins")
-
 enablePlugins(GitVersioning)
 
 git.useGitDescribe := true

@@ -10,8 +10,27 @@ class AtomUtilsSpec extends WordSpec with Matchers {
 
   "AtomUtils.latest" should {
     "find the latest version" in {
-      AtomUtils.latest().name should be ("1.1.0")
-      AtomUtils.latest(false).name should be ("1.2.0-beta0")
+      AtomUtils.latest().name should be ("1.4.0")
+      AtomUtils.latest(false).name should be ("1.4.0")
+    }
+  }
+
+  "AtomUtils.installPackages" should {
+    "install a package" in {
+      IO.withTemporaryDirectory { tmpDir =>
+        val os = AtomUtils.OS.withName(sys.props("os.name"))
+
+        AtomUtils.download(AtomUtils.latest().name, tmpDir, os)
+        AtomUtils.apmExec(tmpDir, os) should be a 'file
+
+        try {
+          AtomUtils.installPackages(tmpDir, os, Seq("heroku-tools"))
+          new File(sys.props.get("user.home").get, ".atom/.apm/heroku-tools") should exist
+        }
+        catch {
+          case e: Exception => fail(e.getMessage)
+        }
+      }
     }
   }
 

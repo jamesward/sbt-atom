@@ -88,9 +88,17 @@ object AtomUtils {
 
     val apm = apmExec(atomHome, os)
 
+    val apmList = Seq(apm.getAbsolutePath, "list").!!.linesIterator
+
     packages.foreach { packageName =>
-      val exitCode = Seq(apm.getAbsolutePath, "install", "-s", packageName).!
-      if (exitCode != 0) throw new Exception(s"Could not install the Atom package: $packageName")
+      if (apmList.exists(_.contains(packageName))) {
+        val exitCode = Seq(apm.getAbsolutePath, "upgrade", "-c", "false", packageName).!(ProcessLogger(_ => Unit))
+        if (exitCode != 0) throw new Exception(s"Could not upgrade the Atom package: $packageName")
+      }
+      else {
+        val exitCode = Seq(apm.getAbsolutePath, "install", "-s", packageName).!(ProcessLogger(_ => Unit))
+        if (exitCode != 0) throw new Exception(s"Could not install the Atom package: $packageName")
+      }
     }
   }
 
@@ -100,8 +108,6 @@ object AtomUtils {
     val atom = atomExec(atomHome, os)
 
     val cmd = atom.getAbsolutePath +: filesToOpen
-
-    println(cmd)
 
     Process(cmd, cwd, "ATOM_PATH" -> atomHome.getAbsolutePath).run(new ProcessIO(_ => Unit, _ => Unit, _ => Unit, true))
   }
