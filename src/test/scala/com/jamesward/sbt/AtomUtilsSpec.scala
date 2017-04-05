@@ -10,8 +10,8 @@ class AtomUtilsSpec extends WordSpec with Matchers {
 
   "AtomUtils.latest" should {
     "find the latest version" in {
-      AtomUtils.latest().name should be ("1.4.0")
-      AtomUtils.latest(false).name should be ("1.4.0")
+      AtomUtils.latest().name should be ("1.15.0")
+      AtomUtils.latest(false).name should be ("1.16.0-beta0")
     }
   }
 
