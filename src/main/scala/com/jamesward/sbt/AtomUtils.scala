@@ -70,8 +70,10 @@ object AtomUtils {
       val prefix = name.split('.').head
       val postfix = name.split('.').last
       IO.withTemporaryFile(prefix, s".$postfix") { atomZipFile =>
-
-        IO.download(new URL(asset.downloadUrl), atomZipFile)
+        val url = new URL(asset.downloadUrl)
+        val stream = url.openStream()
+        IO.transfer(stream, atomZipFile)
+        stream.close()
         Unpack(atomZipFile, atomHome)
       }
     }
@@ -88,7 +90,7 @@ object AtomUtils {
 
     val apm = apmExec(atomHome, os)
 
-    val apmList = Seq(apm.getAbsolutePath, "list").!!.linesIterator
+    val apmList = Seq(apm.getAbsolutePath, "list").lineStream
 
     packages.foreach { packageName =>
       if (apmList.exists(_.contains(packageName))) {

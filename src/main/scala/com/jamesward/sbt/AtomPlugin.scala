@@ -28,7 +28,10 @@ object AtomPlugin extends AutoPlugin {
     atomExcludePrereleases := true,
     atomOs := sys.props.get("os.name").getOrElse(throw new Exception("Operating system could not be determined")),
     atomVersion := AtomUtils.latest(atomExcludePrereleases.value).name,
-    atomReleases := AtomUtils.releases.foreach { release => state.value.log.info(release.name) },
+    atomReleases := {
+      val log = streams.value.log
+      AtomUtils.releases.foreach { release => log.info(release.name) }
+    },
     atomPackages := Seq.empty[String],
     atomFilesToOpen := Seq("./"),
     atomHome := sbt.Path.userHome / ".atom" / atomVersion.value,
